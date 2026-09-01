@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MedyFay Firebase Blueprint",
+  "entities": {
+    "users": {
+      "title": "User Profile",
+      "description": "User accounts, delivery preferences, avatars, and EL Coin loyalty balance",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "mobile": { "type": "string" },
+        "address": { "type": "string" },
+        "city": { "type": "string" },
+        "pincode": { "type": "string" },
+        "memberSince": { "type": "string" },
+        "ordersCount": { "type": "number" },
+        "avatar": { "type": "string" },
+        "elCoins": { "type": "number" },
+        "coinHistory": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "mobile", "address", "city"]
+    },
+    "orders": {
+      "title": "Order",
+      "description": "Placed medicine orders, EL coin transactions, coupons, and tracking details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "deliveryFee": { "type": "number" },
+        "discount": { "type": "number" },
+        "coinDiscount": { "type": "number" },
+        "couponDiscount": { "type": "number" },
+        "appliedCoupon": { "type": "string" },
+        "elCoinsRedeemed": { "type": "number" },
+        "elCoinsEarned": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "deliveryAddress": { "type": "object" },
+        "status": { "type": "string" },
+        "estimatedDelivery": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "items", "totalAmount", "paymentMethod", "status", "deliveryAddress"]
+    },
+    "medicines": {
+      "title": "Medicine Item",
+      "description": "Pharmacy catalog items and stock levels",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "genericName": { "type": "string" },
+        "category": { "type": "string" },
+        "price": { "type": "number" },
+        "originalPrice": { "type": "number" },
+        "inStock": { "type": "boolean" },
+        "prescriptionRequired": { "type": "boolean" },
+        "dosage": { "type": "string" },
+        "packSize": { "type": "string" },
+        "image": { "type": "string" },
+        "description": { "type": "string" },
+        "uses": { "type": "array" },
+        "sideEffects": { "type": "array" },
+        "manufacturer": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" }
+      },
+      "required": ["name", "genericName", "category", "price", "inStock"]
+    }
+  }
+}

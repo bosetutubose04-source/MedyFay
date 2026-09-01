@@ -1,0 +1,58 @@
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, doublePrecision } from 'drizzle-orm/pg-core';
+
+export const medicines = pgTable('medicines', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  genericName: text('generic_name').notNull(),
+  category: text('category').notNull(),
+  price: doublePrecision('price').notNull(),
+  originalPrice: doublePrecision('original_price'),
+  inStock: boolean('in_stock').default(true).notNull(),
+  prescriptionRequired: boolean('prescription_required').default(false).notNull(),
+  dosage: text('dosage').notNull(),
+  packSize: text('pack_size').notNull(),
+  image: text('image').notNull(),
+  description: text('description').notNull(),
+  uses: jsonb('uses').$type<string[]>().notNull(),
+  sideEffects: jsonb('side_effects').$type<string[]>().notNull(),
+  manufacturer: text('manufacturer').notNull(),
+  rating: doublePrecision('rating').default(4.8).notNull(),
+  reviewCount: integer('review_count').default(100).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const orders = pgTable('orders', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  userMobile: text('user_mobile').notNull(),
+  userName: text('user_name').notNull(),
+  items: jsonb('items').notNull(),
+  totalAmount: doublePrecision('total_amount').notNull(),
+  discount: doublePrecision('discount').default(0).notNull(),
+  deliveryAddress: jsonb('delivery_address').notNull(),
+  paymentMethod: text('payment_method').notNull(),
+  paymentStatus: text('payment_status').notNull(),
+  status: text('status').notNull(),
+  date: text('date').notNull(),
+  prescriptionUrl: text('prescription_url'),
+  isQueenOrder: boolean('is_queen_order').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const users = pgTable('users', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  mobile: text('mobile').notNull().unique(),
+  email: text('email'),
+  address: text('address'),
+  city: text('city'),
+  pincode: text('pincode'),
+  avatar: text('avatar'),
+  memberSince: text('member_since'),
+  elCoins: integer('el_coins').default(50).notNull(),
+  coinHistory: jsonb('coin_history').$type<any[]>(),
+  isQueenMember: boolean('is_queen_member').default(true).notNull(),
+  queenTier: text('queen_tier').default('VIP').notNull(),
+  queenSavings: doublePrecision('queen_savings').default(1480).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});

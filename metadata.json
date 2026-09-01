@@ -1,0 +1,6 @@
+{
+  "name": "MedyFay - Medicine Delivery",
+  "description": "30-minute online medicine delivery app powered by Gemini AI with Prescription Vision OCR scanner, Dr. Medy 24/7 AI Clinical Pharmacist, Real-time Drug Safety & Interaction Checker, and EL Coin Loyalty Rewards.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
