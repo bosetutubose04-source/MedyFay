@@ -26,16 +26,25 @@ import firebaseConfig from '../../firebase-applet-config.json';
 import { Medicine, Order, UserProfile, CartItem } from '../types';
 import { MEDICINES_DATA } from '../data/medicines';
 
-// Initialize Firebase App
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// Initialize Firebase App with robust error handling for static hosting (GitHub Pages)
+let app: any = null;
+let dbInstance: any = null;
+let authInstance: any = null;
 
-// Initialize Firestore with specific databaseId if specified
-export const db = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
-  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
-  : getFirestore(app);
+try {
+  if (firebaseConfig && firebaseConfig.apiKey) {
+    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    dbInstance = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
+      ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
+      : getFirestore(app);
+    authInstance = getAuth(app);
+  }
+} catch (e) {
+  console.warn('Firebase initialization skipped / running in local fallback mode:', e);
+}
 
-// Initialize Auth
-export const auth = getAuth(app);
+export const db = dbInstance;
+export const auth = authInstance || { currentUser: null };
 
 // Collections
 export const COLLECTIONS = {
@@ -47,12 +56,13 @@ export const COLLECTIONS = {
 
 // Ensure anonymous authentication on startup for seamless access
 export const initAnonymousAuth = async (): Promise<FirebaseUser | null> => {
+  if (!authInstance) return null;
   try {
-    if (!auth.currentUser) {
-      const userCredential = await signInAnonymously(auth);
+    if (!authInstance.currentUser) {
+      const userCredential = await signInAnonymously(authInstance);
       return userCredential.user;
     }
-    return auth.currentUser;
+    return authInstance.currentUser;
   } catch (error: any) {
     if (error?.code !== 'auth/admin-restricted-operation') {
       console.warn('Anonymous auth note:', error?.message || error);
@@ -63,6 +73,7 @@ export const initAnonymousAuth = async (): Promise<FirebaseUser | null> => {
 
 // Seed medicines if collection is empty
 export const seedMedicinesIfEmpty = async (): Promise<Medicine[]> => {
+  if (!db) return MEDICINES_DATA;
   try {
     const medRef = collection(db, COLLECTIONS.MEDICINES);
     const snapshot = await getDocs(medRef);
@@ -95,6 +106,7 @@ export const seedMedicinesIfEmpty = async (): Promise<Medicine[]> => {
 
 // User Profile Operations
 export const saveUserProfile = async (userId: string, profile: Partial<UserProfile>): Promise<void> => {
+  if (!db) return;
   try {
     const userDocRef = doc(db, COLLECTIONS.USERS, userId);
     await setDoc(userDocRef, {
@@ -108,6 +120,7 @@ export const saveUserProfile = async (userId: string, profile: Partial<UserProfi
 };
 
 export const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
+  if (!db) return null;
   try {
     const userDocRef = doc(db, COLLECTIONS.USERS, userId);
     const snap = await getDoc(userDocRef);
@@ -123,6 +136,7 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
 
 // Orders Operations
 export const createOrderInFirestore = async (orderData: Order, userId?: string): Promise<string> => {
+  if (!db) return orderData.id;
   try {
     const orderDocRef = doc(db, COLLECTIONS.ORDERS, orderData.id);
     await setDoc(orderDocRef, {
@@ -141,6 +155,7 @@ export const subscribeToOrders = (
   userId: string | undefined, 
   callback: (orders: Order[]) => void
 ): Unsubscribe => {
+  if (!db) return () => {};
   try {
     const ordersRef = collection(db, COLLECTIONS.ORDERS);
     // Listen to all orders or user-specific orders
@@ -172,6 +187,7 @@ export const subscribeToOrders = (
 };
 
 export const updateOrderStatusInFirestore = async (orderId: string, newStatus: Order['status']): Promise<void> => {
+  if (!db) return;
   try {
     const orderDocRef = doc(db, COLLECTIONS.ORDERS, orderId);
     await updateDoc(orderDocRef, {
@@ -184,6 +200,7 @@ export const updateOrderStatusInFirestore = async (orderId: string, newStatus: O
 };
 
 export const saveMedicineToFirestore = async (medicine: Medicine): Promise<void> => {
+  if (!db) return;
   try {
     const docRef = doc(db, COLLECTIONS.MEDICINES, medicine.id);
     await setDoc(docRef, {
@@ -196,6 +213,7 @@ export const saveMedicineToFirestore = async (medicine: Medicine): Promise<void>
 };
 
 export const deleteMedicineFromFirestore = async (medicineId: string): Promise<void> => {
+  if (!db) return;
   try {
     const docRef = doc(db, COLLECTIONS.MEDICINES, medicineId);
     await updateDoc(docRef, {
@@ -208,6 +226,7 @@ export const deleteMedicineFromFirestore = async (medicineId: string): Promise<v
 };
 
 export const fetchAllUsersFromFirestore = async (): Promise<UserProfile[]> => {
+  if (!db) return [];
   try {
     const snap = await getDocs(collection(db, COLLECTIONS.USERS));
     return snap.docs.map(d => ({ ...d.data() } as UserProfile));
