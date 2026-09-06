@@ -6,8 +6,8 @@
     <title>MedyFay - Medicine Delivery</title>
     <script type="text/javascript">
       // Single Page Apps for GitHub Pages
-      // Redirects any 404 to index.html with query parameters preserved
-      var pathSegmentsToKeep = 0; 
+      // Detects project repository subpaths (e.g. username.github.io/repo-name/)
+      var pathSegmentsToKeep = (window.location.hostname.indexOf('github.io') !== -1 && window.location.pathname.split('/').filter(Boolean).length > 0) ? 1 : 0; 
       var l = window.location;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +

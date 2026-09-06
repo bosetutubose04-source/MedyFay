@@ -10,10 +10,22 @@ export const ErrorBoundary: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
-      setError(event.error || new Error(event.message));
+      if (event.error) {
+        setError(event.error);
+      } else if (event.message) {
+        setError(new Error(event.message));
+      }
     };
+
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      setError(new Error(event.reason?.message || String(event.reason)));
+      const reason = event.reason;
+      if (reason instanceof Error) {
+        setError(reason);
+      } else if (typeof reason === 'string') {
+        setError(new Error(reason));
+      } else {
+        setError(new Error('Unhandled Promise Rejection'));
+      }
     };
 
     window.addEventListener('error', handleError);
@@ -32,7 +44,7 @@ export const ErrorBoundary: React.FC<Props> = ({ children }) => {
           <div className="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
             <AlertTriangle className="w-8 h-8" />
           </div>
-          
+
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Something went wrong</h1>
             <p className="text-sm text-slate-600">

@@ -13,17 +13,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script type="text/javascript">
-      // Single Page Apps for GitHub Pages router restore
-      (function(l) {
-        if (l.search[1] === '/' ) {
+      // GitHub Pages SPA Redirect & Missing Trailing-Slash Fix
+      (function() {
+        var path = window.location.pathname;
+        // Fix missing trailing slash on repository subpaths (prevents relative assets 404)
+        if (path.length > 1 && !path.endsWith('/') && !path.split('/').pop().includes('.')) {
+          window.location.replace(path + '/' + window.location.search + window.location.hash);
+          return;
+        }
+        // Single Page Apps router restore from 404.html
+        var l = window.location;
+        if (l.search && l.search[1] === '/') {
           var decoded = l.search.slice(1).split('&').map(function(s) { 
-            return s.replace(/~and~/g, '&')
+            return s.replace(/~and~/g, '&');
           }).join('?');
           window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
+            l.pathname.slice(0, -1) + decoded + l.hash
           );
         }
-      }(window))
+      }());
     </script>
   </head>
   <body>
