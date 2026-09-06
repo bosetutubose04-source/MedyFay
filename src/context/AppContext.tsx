@@ -115,15 +115,17 @@ const STORAGE_KEYS = {
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load initial User
   const [user, setUser] = useState<UserProfile | null>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.USER);
-    if (saved) {
-      try { 
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.USER);
+      if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.elCoins !== 'number') {
           parsed.elCoins = 15; // default 15 welcome EL coins
         }
         return parsed;
-      } catch { return null; }
+      }
+    } catch {
+      // ignore
     }
     return {
       name: 'Rohan Bose',
@@ -174,9 +176,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Cart
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.CART);
-    if (saved) {
-      try { return JSON.parse(saved); } catch { return []; }
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.CART);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch {
+      // ignore
     }
     return [
       { medicine: MEDICINES_DATA[0], quantity: 2 },
@@ -187,9 +193,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Orders
   const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.ORDERS);
-    if (saved) {
-      try { return JSON.parse(saved); } catch { return []; }
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.ORDERS);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch {
+      // ignore
     }
     return [
       {
@@ -260,19 +270,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Sync to local storage
   useEffect(() => {
-    if (user) {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.USER);
+    try {
+      if (user) {
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.USER);
+      }
+    } catch {
+      // ignore
     }
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
+    try {
+      localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
+    } catch {
+      // ignore
+    }
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+    try {
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+    } catch {
+      // ignore
+    }
   }, [orders]);
 
   const addToast = (text: string, type: 'success' | 'info' | 'warning' = 'success') => {
