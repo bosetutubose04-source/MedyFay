@@ -85,6 +85,7 @@ export interface Order {
   coinDiscount?: number;
   couponDiscount?: number;
   appliedCoupon?: string;
+  couponCode?: string;
   elCoinsRedeemed?: number;
   elCoinsEarned?: number;
   totalAmount: number;
