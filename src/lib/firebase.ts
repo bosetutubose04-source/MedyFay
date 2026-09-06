@@ -26,16 +26,26 @@ import firebaseConfig from '../../firebase-applet-config.json';
 import { Medicine, Order, UserProfile, CartItem } from '../types';
 import { MEDICINES_DATA } from '../data/medicines';
 
-// Initialize Firebase App with robust error handling for static hosting (GitHub Pages)
+// Initialize Firebase App with environment variable support & fallback for static hosting
 let app: any = null;
 let dbInstance: any = null;
 let authInstance: any = null;
 
+const resolvedConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || (firebaseConfig as any)?.apiKey,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || (firebaseConfig as any)?.authDomain,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || (firebaseConfig as any)?.projectId,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || (firebaseConfig as any)?.storageBucket,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || (firebaseConfig as any)?.messagingSenderId,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || (firebaseConfig as any)?.appId,
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || (firebaseConfig as any)?.firestoreDatabaseId,
+};
+
 try {
-  if (firebaseConfig && firebaseConfig.apiKey) {
-    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-    dbInstance = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
-      ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
+  if (resolvedConfig.apiKey) {
+    app = getApps().length > 0 ? getApp() : initializeApp(resolvedConfig);
+    dbInstance = resolvedConfig.firestoreDatabaseId && resolvedConfig.firestoreDatabaseId !== '(default)'
+      ? getFirestore(app, resolvedConfig.firestoreDatabaseId)
       : getFirestore(app);
     authInstance = getAuth(app);
   }
