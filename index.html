@@ -13,17 +13,26 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script type="text/javascript">
-      // Single Page Apps for GitHub Pages router restore
-      (function(l) {
-        if (l.search[1] === '/' ) {
+      // 1. GitHub Pages Trailing Slash Fix:
+      // If hosted on GitHub Pages (e.g. https://user.github.io/repo) without a trailing slash,
+      // relative assets ('./assets/...') will resolve to root ('/assets/...'), resulting in 404s.
+      // Automatically redirect to the trailing-slash URL before scripts execute.
+      (function() {
+        var l = window.location;
+        if (l.pathname.length > 1 && !l.pathname.endsWith('/') && !l.pathname.split('/').pop().includes('.')) {
+          l.replace(l.protocol + '//' + l.host + l.pathname + '/' + l.search + l.hash);
+          return;
+        }
+        // 2. Single Page Apps router restore from 404.html
+        if (l.search && l.search[1] === '/') {
           var decoded = l.search.slice(1).split('&').map(function(s) { 
             return s.replace(/~and~/g, '&');
           }).join('?');
           window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
+            l.pathname.slice(0, -1) + decoded + l.hash
           );
         }
-      }(window.location));
+      }());
     </script>
   </head>
   <body>
